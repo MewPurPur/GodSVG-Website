@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="assets/normalize.css">
+	<link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+	<title>SVG editor – GodSVG</title>
+	<meta property="og:title" content="SVG editor – GodSVG" />
+	<meta property="og:description" content="GodSVG, a low-level vector graphics editor, available on all major platforms" />
+	<meta property="og:image" content="/assets/favicon.ico" />
+	<meta property="og:type" content="website" />
+
+	<style>
+		html {
+			color: white;
+			font-size: min(9vw, 30px);
+			font-family: "Noto Sans";
+		}
+
+		body {
+			background-color: #212427;
+			margin: 0 auto;
+			max-width: 1200px;
+		}
+
+		a {
+			color: #4284e0;
+			text-decoration: underline;
+		}
+
+		br {
+			margin-bottom: 0.25rem;
+		}
+
+		a:hover {
+			color: #64a8f7;
+			text-decoration: underline;
+		}
+
+		.content {
+			width: 90%;
+			max-width: 960px;
+			margin: 0 auto;
+		}
+
+		#top-section {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.faq-question {
+			color: white;
+			font-size: 1.0rem;
+			font-family: 'Asap';
+			margin-bottom: 0.1rem;
+			margin-top: 1rem;
+			margin-bottom: 0.25rem;
+		}
+
+		.dim-text {
+			font-size: 0.7rem;
+			line-height: 1rem;
+			font-family: "Noto Sans";
+			color: #a7a7a7;
+			margin-top: 0rem;
+			margin-bottom: 0.25rem;
+		}
+
+		.dim-text li {
+			margin-bottom: 0.25rem;
+			list-style-type: none;
+		}
+
+		.social-icon {
+			width: 1rem;
+			height: 1rem;
+			margin-bottom: -0.2rem;
+			margin-right: 0.2rem;
+		}
+
+		#download-section {
+			display: flex;
+			justify-content: center;
+			margin-top: 20px;
+		}
+
+		.download-button {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background-color: #2e6cb8;
+			color: white;
+			padding: 10px 20px;
+			border-radius: 5px;
+			margin: 10px;
+			padding: 10px;
+			text-decoration: none;
+		}
+
+		.download-button:hover {
+			color: white;
+			background-color: #1e4a7c;
+			text-decoration: none;
+		}
+
+		.download-button .platform-icon {
+			margin-right: 10px;
+			height: 1.5rem;
+			width: 1.5rem;
+		}
+
+		.download-button .small-text {
+			font-size: 0.45rem;
+			white-space: nowrap;
+		}
+
+		.download-button .big-text {
+			font-size: 0.8rem;
+			font-weight: 600;
+		}
+
+		#footer {
+			font-size: 0.5rem;
+			text-align: center;
+			color: #606468;
+		}
+
+		.tab-container {
+			display: flex;
+			justify-content: center;
+			margin: 10px 0;
+		}
+
+		.tab {
+			flex: 1; /* Ensure tabs are equal width */
+			display: inline-block;
+			background-color: #333;
+			color: #e0e0e0;
+			padding: 10px 20px;
+			border-radius: 5px;
+			margin: 10px;
+			cursor: pointer;
+			text-align: center; /* Center the text inside the tabs */
+		}
+
+		.tab:hover {
+			color: #f4f4f4;
+			background-color: #444;
+		}
+
+		.tab.selected {
+			color: white;
+			background-color: #555;
+			cursor: default;
+		}
+	</style>
+</head>
+
+<body>
+	<div style="height:1rem;"></div>
+
+	<div class="content" id="top-section">
+		<img src="assets/favicon.ico" alt="favicon.ico" width="224px">
+		<div>
+			<span style="font-family: 'Asap'; font-weight: 700; font-size: 96px; color: #def">GodSVG</span><br>
+			<span style="font-family: 'Asap'; font-weight: 500; font-size: 64px; color: #def">SVG editor</span>
+		</div>
+	</div>
+
+	<div style="height:0.5rem;"></div>
+	
+	<div class="content" id="download-section">
+		<a href="downloads/GodSVG.Windows.zip" class="download-button">
+			<img src="assets/platforms_windows.svg" class="platform-icon">
+			<div align-items="vertical">
+				<div class="small-text">Download for</div>
+				<div class="big-text">Windows</div>
+			</div>
+		</a>
+		<a href="downloads/GodSVG.Linux.zip" class="download-button">
+			<img src="assets/platforms_linux.svg" class="platform-icon">
+			<div align-items="vertical">
+				<div class="small-text">Download for</div>
+				<div class="big-text">Linux</div>
+			</div>
+		</a>
+		<a href="downloads/GodSVG.MacOS.zip" class="download-button">
+			<img src="assets/platforms_macos.svg" class="platform-icon">
+			<div align-items="vertical">
+				<div class="small-text">Download for</div>
+				<div class="big-text">MacOS</div>
+			</div>
+		</a>
+	</div>
+	<div class="dim-text" style="text-align: center;">Current version: <b>1.0-alpha3</b>. See all GodSVG releases <a href="https://github.com/MewPurPur/GodSVG/releases/">here</a>.</div>
+	
+	<div class="content">
+		<div style="height:0.5rem;"></div>
+		<div class="dim-text">Don't want to download anything? Try out the <a href="https://mewpurpur.github.io/GodSVG/web-build/">web build</a> (but keep in mind it's worse.)</div>
+	</div>
+
+	<div style="height:0.5rem;"></div>
+
+	<div class="content">
+		<div class="tab-container">
+			<div class="tab selected" onclick="toggle_content(0)">Features</div>
+			<div class="tab" onclick="toggle_content(1)">FAQ</div>
+		</div>
+
+		<div id="features-content" style="display: block;">
+			<div style="margin-top: 1rem;"></div>
+			<p class="dim-text">
+			<b>GodSVG is an editor for Scalable Vector Graphics (SVG) files in early development.</b> Unlike other editors, it represents the SVG code directly, doesn't add any metadata, and even lets you edit the SVG code in real time. GodSVG is inspired by the need for an SVG editor without abstractions that produces clean and optimized files.</p>
+
+			<div style="height:0.5rem;"></div>
+			<img src="assets/usage.png" width="100%" />
+			<div style="height:0.5rem;"></div>
+			<ul class="dim-text">
+				<li>• Interactive SVG editing: Modify individual elements of an SVG file using a user-friendly interface.</li>
+				<li>• Real-time code: As you manipulate elements in the UI, code is instantly generated and can be edited.</li>
+				<li>• Optimized SVGs: The generated SVG files are small and efficient, and there are many options to assist with optimization.</li>
+			</ul>
+
+		</div>
+
+		<div id="faq-content" style="display: none;">
+			<h2 class="faq-question">Who is making GodSVG?</h2>
+			<p class="dim-text">
+				GodSVG was started in May 2023 by me (MewPurPur) and open-sourced in June 2023. Since the open-sourcing, other people have joined in to help, but I still do the vast majority of the work. Most of us are listed in GodSVG's "About" dialog.</p>
+
+			<h2 class="faq-question">GodSVG has been in alpha for so long... Will it ever release?</h2>
+			<p class="dim-text">
+				GodSVG <b>1.0-alpha1</b> released in December 2023.<br>
+				I'm the main bottleneck. Getting GodSVG to a beta version involves implementing features like the &lt;g> tag and gradients. I doubt anyone else would be able to implement those. But getting to this is slow, as I work 8h a day and I have to also spend time on things like sleeping, chores, staying healthy. I already dedicate ungodly amounts of my free time to try and push GodSVG to the finish line, but I don't have enough of time.<br>
+				If I get enough donations, I can justify things like taking unpaid leaves that would speed up development. Donations have so far helped me enormously: I have a few donation platforms set up, feel free to choose the one you prefer. <a href="https://www.patreon.com/GodSVG">Patreon</a>, <a href="https://ko-fi.com/mewpurpur">Ko-Fi</a>, and <a href="https://github.com/sponsors/MewPurPur">Github Sponsors</a>.</p>
+
+			<h2 class="faq-question">I tried GodSVG and found bugs and shortcomings.</h2>
+			<p class="dim-text">
+				GodSVG is not even in beta yet, so this is to be expected. Report any issues you find on Github, in the Issues tab.</p>
+
+			<h2 class="faq-question">Do you have the social media?</h2>
+			<p class="dim-text">
+				I have accounts on a few social medias. All of them are owned by multi-billion tech companies! No guarantee the unofficial ones will always be on topic.</p>
+			<p class="dim-text">
+				<b>Official:</b>
+			</p>
+			<ul class="dim-text">
+				<li>
+					<img class="social-icon" src="assets/socials_github.png" alt="github icon">
+					<a href="https://github.com/MewPurPur/GodSVG">Github repository</a> for general surveillance of the developers.
+				</li>
+				<li>
+					<img class="social-icon" src="assets/socials_discord.png" alt="discord icon">
+					<a href="https://discord.gg/R8pM6vXWTY">Discord server</a> for development and casual chat.
+				</li>
+			</ul>
+			<p class="dim-text">
+				<b>Unofficial (personal):</b>
+			</p>
+			<ul class="dim-text">
+				<li>
+					<img class="social-icon" src="assets/socials_twitter.png" alt="twitter icon">
+					<a href="https://twitter.com/MewPurPur">tweeter account</a> for hot takes I'll regret later.
+				</li>
+				<li>
+					<img class="social-icon" src="assets/socials_youtube.png" alt="youtube icon">
+					<a href="https://www.youtube.com/@MewPurPur">yuutub channel</a> for Like, comment, and subscribe!
+				</li>
+			</ul>
+
+			<h2 class="faq-question">What are your plans for GodSVG?</h2>
+			<p class="dim-text">
+				GodSVG is an assisted SVG code editor - to put it simply, it can only be as strong as the SVG format allows it to be. Also, there are no plans for animation.<br />
+				In my opinion, GodSVG is best at teaching the SVG format, creating simple iconography, optimizing existing SVGs, and creating SVGs with code. If your use cases are different, then it might not be for you - consider proper SVG editors.
+				Making it better in these regards is the direction I'm pursuing.</p>
+
+			<h2 class="faq-question">
+				I speak one of Earth's many languages! Do you need help with translation?</h2>
+			<p class="dim-text">
+				Bonjour! GodSVG is community-translated and you can read how to do it <a href="https://github.com/MewPurPur/GodSVG/tree/main/translations">here</a>. Hit me up on Discord if you need help.</p>
+		</div>
+	</div>
+
+	<div style="height:1rem;"></div>
+
+	<div class="content">
+		<p id="footer">
+			&COPY; 2023 MewPurPur, 2023-present GodSVG contributors. All rights reserved.</p>
+	</div>
+
+	<div style="height:0.5rem;"></div>
+
+	<script>
+		function toggle_content(tab_idx) {
+			var featuresContent = document.getElementById("features-content");
+			var faqContent = document.getElementById("faq-content");
+			var tabs = document.querySelectorAll(".tab");
+			
+			if (tab_idx === 0) {
+				featuresContent.style.display = "block";
+				faqContent.style.display = "none";
+			} else if (tab_idx === 1) {
+				featuresContent.style.display = "none";
+				faqContent.style.display = "block";
+			}
+			
+			tabs.forEach(function(tab, index) {
+				if (index === tab_idx) {
+					tab.classList.add("selected");
+					tab.classList.remove("hover");
+					tab.style.cursor = "default";
+				} else {
+					tab.classList.remove("selected");
+					tab.style.cursor = "pointer";
+				}
+			});
+		}
+	</script>
+</body>
+
+</html>
+
