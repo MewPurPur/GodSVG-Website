@@ -23,7 +23,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="assets/normalize.css">
 	<link rel="icon" href="assets/favicon.ico" type="image/x-icon">
-	<link href="https://fonts.googleapis.com/css2?family=Asap:wght@400;500;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+	<!-- I don't know what this does. An LLM gave it to me and it seems to remove the stutter when loading the font. Or maybe this is the first step to taking over the world. -->
+	<link rel="preload" href="https://fonts.googleapis.com/css2?family=Asap:wght@400;500;700&family=Noto+Sans:wght@400;700&display=swap" as="style" onload="this.rel='stylesheet'">
+	<noscript>
+		<link href="https://fonts.googleapis.com/css2?family=Asap:wght@400;500;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+	</noscript>
+	
 	<title>GodSVG – SVG editor</title>
 	<meta name="description" content="GodSVG, a low-level vector graphics editor, available on all major desktop platforms" />
 	<meta property="og:title" content="GodSVG - Free and Open Source SVG editor" />
@@ -263,8 +268,8 @@
 	<div class="content" id="top-section">
 		<img src="assets/favicon.ico" alt="GodSVG logo" style="width: min(210px, 21vw)">
 		<div>
-			<h1 style="font-family: 'Asap'; font-weight: 700; font-size: min(100px, 10vw); color: #def">GodSVG</h1><br>
-			<h2 style="font-family: 'Asap'; font-weight: 500; font-size: min(69px, 6.9vw); color: #def; margin-left: 8px">SVG editor</h2>
+			<span style="font-family: 'Asap'; font-weight: 700; font-size: min(100px, 10vw); color: #def">GodSVG</span><br>
+			<span style="font-family: 'Asap'; font-weight: 500; font-size: min(69px, 6.9vw); color: #def; margin-left: 8px">SVG editor</span>
 		</div>
 	</div>
 
@@ -397,7 +402,7 @@
 			<div style="margin-top: 0.5rem;"></div>
 			<ul class="dim-text">
 				<li>
-					<img class="social-icon" src="assets/donate_github_sponsors.png" alt="Github logo">
+					<img class="social-icon" src="assets/donate_github_sponsors.svg" alt="Github logo">
 					<a href="https://github.com/sponsors/MewPurPur" style="font-size:0.75rem">Github Sponsors</a>
 					<ul>
 						<li class="list-pro">Low extra fees</li>
@@ -406,7 +411,7 @@
 					</ul>
 				</li>
 				<li>
-					<img class="social-icon" src="assets/donate_ko_fi.png" alt="Ko-Fi logo">
+					<img class="social-icon" src="assets/donate_ko_fi.svg" alt="Ko-Fi logo">
 					<a href="https://ko-fi.com/mewpurpur" style="font-size:0.75rem">Ko-Fi</a>
 					<ul>
 						<li class="list-pro">Low extra fees</li>
@@ -415,7 +420,7 @@
 					</ul>
 				</li>
 				<li>
-					<img class="social-icon" src="assets/donate_patreon.png" alt="Patreon logo">
+					<img class="social-icon" src="assets/donate_patreon.svg" alt="Patreon logo">
 					<a href="https://www.patreon.com/GodSVG" style="font-size:0.75rem">Patreon</a>
 					<ul>
 						<li class="list-pro">Low extra fees</li>
