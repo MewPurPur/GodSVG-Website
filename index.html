@@ -94,17 +94,36 @@
 			justify-content: center;
 			background-color: #2e6cb8;
 			color: white;
-			padding: 10px 20px;
 			border-radius: 5px;
-			margin: 10px;
+			margin: 10px 8px;
 			padding: 10px;
 			text-decoration: none;
 		}
 
 		.download-button:hover {
 			color: white;
-			background-color: #1e4a7c;
+			background-color: #2860a0;
 			text-decoration: none;
+		}
+		
+		.download-button:active {
+			background-color: #1e4a7c;
+		}
+		
+		.download-button.inactive {
+			background-color: #666;
+			color: #ccc;
+			transform: scale(0.8);
+		}
+
+		.download-button.inactive:hover {
+			background-color: #777;
+			color: #ddd;
+		}
+		
+		.download-button.inactive:active {
+			background-color: #999;
+			color: #fff;
 		}
 
 		.download-button .platform-icon {
@@ -154,8 +173,43 @@
 
 		.tab.selected {
 			color: white;
-			background-color: #555;
+			background-color: #666;
 			cursor: default;
+			font-weight: bold;
+		}
+
+		.donate-tab {
+			background-color: #3e2931;
+			color: white;
+		}
+		
+		.donate-tab:hover {
+			background-color: #533742;
+		}
+
+		.donate-tab.selected {
+			background-color: #c8a;
+			cursor: default;
+		}
+		
+		.list-pro {
+			color: #9e9;
+		}
+
+		.list-pro::before {
+			 content: "+";
+			 display: inline-block;
+			 width: 0.85em;
+		}
+		
+		.list-con {
+			color: #e99;
+		}
+		
+		.list-con::before {
+			 content: "–";
+			 display: inline-block;
+			 width: 0.85em;
 		}
 	</style>
 </head>
@@ -209,6 +263,7 @@
 		<div class="tab-container">
 			<div class="tab selected" onclick="toggle_content(0)">Features</div>
 			<div class="tab" onclick="toggle_content(1)">FAQ</div>
+			<div class="tab donate-tab" onclick="toggle_content(2)">Donate</div>
 		</div>
 
 		<div id="features-content" style="display: block;">
@@ -224,31 +279,30 @@
 				• Real-time code: As you manipulate elements in the UI, code is instantly generated and can be edited.<br />
 				• Optimized SVGs: The generated SVG files are small and efficient, and there are many options to assist with optimization.<br />
 			</p>
-
 		</div>
 
 		<div id="faq-content" style="display: none;">
 			<h2 class="faq-question">Who is making GodSVG?</h2>
 			<p class="dim-text">
-				GodSVG was started in May 2023 by me (MewPurPur) and open-sourced in June 2023. Since the open-sourcing, other people have joined in to help, but I still do the vast majority of the work. Most of us are listed in GodSVG's "About" dialog.</p>
+				GodSVG was started in May 2023 by me (MewPurPur) and open-sourced in June 2023. Since the open-sourcing, other people have joined in to help, but I still do the vast majority of the work. Everyone who has made major contributions are listed inside GodSVG's "About" dialog.</p>
 
 			<h2 class="faq-question">GodSVG has been in alpha for so long... Will it ever release?</h2>
 			<p class="dim-text">
 				GodSVG <b>1.0-alpha1</b> released in December 2023.<br>
 				I'm the main bottleneck. Getting GodSVG to a beta version involves implementing features like the &lt;g> tag and gradients. I doubt anyone else would be able to implement those. But getting to this is slow, as I work 8h a day and I have to also spend time on things like sleeping, chores, staying healthy. I already dedicate a lot of my free time to try and push GodSVG to the finish line, but I need more.<br>
-				If I get enough donations, I can justify things like taking unpaid leaves that would speed up development. Donations have so far helped me enormously; if you can donate, I would be very grateful! I have a few donation platforms set up, feel free to choose whichever you prefer: <a href="https://www.patreon.com/GodSVG">Patreon</a>, <a href="https://ko-fi.com/mewpurpur">Ko-Fi</a>, and <a href="https://github.com/sponsors/MewPurPur">Github Sponsors</a>.</p>
+				If I get enough donations, I can justify things like taking unpaid leaves that would speed up development. Donations have so far helped me enormously, so if you can <a onclick="toggle_content(2)" style="cursor: pointer">donate</a>, I would be very grateful!</p>
 
 			<h2 class="faq-question">I tried GodSVG and found bugs and shortcomings.</h2>
 			<p class="dim-text">
-				GodSVG is not even in beta yet, so this is to be expected. Report any issues you have <a href="https://github.com/MewPurPur/GodSVG/issues">here.</a></p>
+				GodSVG is not even in beta yet, so this is to be expected. Report any issues you have <a href="https://github.com/MewPurPur/GodSVG/issues">here</a>.</p>
 
 			<h2 class="faq-question">How can I trust you?</h2>
-			<div class="dim-text">GodSVG is Free and Open Source. If I did something shady, people would be able to find it in the source code and the project would die.
+			<div class="dim-text">GodSVG is Free and Open Source. If I do something shady, people find it in the source code and it would kill the project. So you can trust me.
 				GodSVG source code can be found <a href="https://github.com/MewPurPur/GodSVG">here</a>. This website's source code can be found <a href="https://github.com/MewPurPur/godsvg-website">here</a>.</div>
 			
 			<h2 class="faq-question">Do you have the social media?</h2>
 			<p class="dim-text">
-				I have accounts on a few social medias. All of them are owned by multi-billion tech companies! No guarantee the unofficial ones will always be on topic.</p>
+				I have accounts on some social media. All of them are owned by multi-billion tech companies! I give no guarantee that the unofficial ones will always be on topic.</p>
 			<p class="dim-text">
 				<b>Official:</b>
 			</p>
@@ -270,7 +324,7 @@
 					<img class="social-icon" src="assets/socials_twitter.png" alt="twitter icon">
 					<a href="https://twitter.com/MewPurPur">tweeter account</a> for hot takes I'll regret later.
 				</li>
-				<!-- YouTube is way too irrelevant, there's nothing GodSVG-related on it right now.
+				<!-- YouTube is way too irrelevant, there's nothing GodSVG-related on it right now. I was thinking about tool tutorials, but not at the moment.
 				<li>
 					<img class="social-icon" src="assets/socials_youtube.png" alt="youtube icon">
 					<a href="https://www.youtube.com/@MewPurPur">yuutub channel</a> for Like, comment, and subscribe!
@@ -291,6 +345,43 @@
 
 			<p class="dim-text">I hope this gave you all the answers you wanted – even the ones you didn't know you needed! Hit me up on Discord if you want to ask anything else.</p>
 		</div>
+		
+		<div id="donate-content" style="display: block;">
+			<div style="margin-top: 1rem;"></div>
+			<p class="dim-text">
+			Donations will help me push GodSVG through to a stable release. Right now, I have to balance out development with my regular job as I don't get enough from donations.<br />
+			I have a few donation platforms set up, so choose the one you prefer:</p>
+			<div style="margin-top: 0.5rem;"></div>
+			<ul class="dim-text">
+				<li>
+					<img class="social-icon" src="assets/donate_github_sponsors.png" alt="github icon">
+					<a href="https://github.com/sponsors/MewPurPur" style="font-size:0.75rem">Github Sponsors</a>
+					<ul>
+						<li class="list-pro">Low extra fees</li>
+						<li class="list-pro">Includes all perks</li>
+						<li class="list-pro">Can donate an arbitrary amount</li>
+					</ul>
+				</li>
+				<li>
+					<img class="social-icon" src="assets/donate_ko_fi.png" alt="ko-fi icon">
+					<a href="https://ko-fi.com/mewpurpur" style="font-size:0.75rem">Ko-Fi</a>
+					<ul>
+						<li class="list-pro">Low extra fees</li>
+						<li class="list-pro">Can donate an arbitrary amount</li>
+						<li class="list-con">No perks</li>
+					</ul>
+				</li>
+				<li>
+					<img class="social-icon" src="assets/donate_patreon.png" alt="patreon icon">
+					<a href="https://www.patreon.com/GodSVG" style="font-size:0.75rem">Patreon</a>
+					<ul>
+						<li class="list-pro">Low extra fees</li>
+						<li class="list-con">Higher extra fees</li>
+						<li class="list-con">Can only donate fixed amounts</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
 	</div>
 
 	<div style="height:1rem;"></div>
@@ -306,14 +397,21 @@
 		function toggle_content(tab_idx) {
 			var featuresContent = document.getElementById("features-content");
 			var faqContent = document.getElementById("faq-content");
+			var donateContent = document.getElementById("donate-content");
 			var tabs = document.querySelectorAll(".tab");
 			
 			if (tab_idx === 0) {
 				featuresContent.style.display = "block";
 				faqContent.style.display = "none";
+				donateContent.style.display = "none";
 			} else if (tab_idx === 1) {
 				featuresContent.style.display = "none";
 				faqContent.style.display = "block";
+				donateContent.style.display = "none";
+			} else if (tab_idx === 2) {
+				featuresContent.style.display = "none";
+				faqContent.style.display = "none";
+				donateContent.style.display = "block";
 			}
 			
 			tabs.forEach(function(tab, index) {
@@ -327,6 +425,43 @@
 				}
 			});
 		}
+		
+		function getOS() {
+			var userAgent = window.navigator.userAgent,
+				platform = window.navigator.platform,
+				macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+				windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+				iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+				os = null;
+
+			if (macosPlatforms.indexOf(platform) !== -1) {
+				os = 'MacOS';
+			} else if (iosPlatforms.indexOf(platform) !== -1) {
+				os = 'iOS';
+			} else if (windowsPlatforms.indexOf(platform) !== -1) {
+				os = 'Windows';
+			} else if (/Android/.test(userAgent)) {
+				os = 'Android';
+			} else if (!os && /Linux/.test(platform)) {
+				os = 'Linux';
+			}
+
+			return os;
+		}
+
+		function applyInactiveStyles() {
+			var os = getOS();
+			var buttons = document.querySelectorAll('.download-button');
+
+			buttons.forEach(function(button) {
+				var platform = button.getAttribute('href').split('.').slice(-2, -1)[0]; // Extract platform from href
+				if (!platform.includes(os)) {
+					button.classList.add('inactive');
+				}
+			});
+		}
+
+		document.addEventListener('DOMContentLoaded', applyInactiveStyles);
 	</script>
 </body>
 
