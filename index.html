@@ -98,6 +98,7 @@
 			margin: 10px 8px;
 			padding: 10px;
 			text-decoration: none;
+			transform: scale(min(0.1, vw / 500));
 		}
 
 		.download-button:hover {
@@ -197,9 +198,10 @@
 		}
 
 		.list-pro::before {
-			 content: "+";
-			 display: inline-block;
-			 width: 0.85em;
+			content: "+";
+			font-weight: bold;
+			display: inline-block;
+			width: 0.85em;
 		}
 		
 		.list-con {
@@ -207,10 +209,31 @@
 		}
 		
 		.list-con::before {
-			 content: "–";
-			 display: inline-block;
-			 width: 0.85em;
+			content: "–";
+			font-weight: bold;
+			display: inline-block;
+			width: 0.85em;
 		}
+		
+		@media (max-width: 600px) {
+			html {
+				font-size: min(12vw, 24px);
+			}
+
+			.download-button {
+				padding: 5px;
+				margin: 5px;
+			}
+
+			.download-button .platform-icon {
+				margin-right: 5px;
+			}
+
+			.tab {
+				padding: 5px;
+				margin: 5px;
+				font-size: 75%;
+			}
 	</style>
 </head>
 
