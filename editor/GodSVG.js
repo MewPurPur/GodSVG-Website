@@ -10074,6 +10074,52 @@ function _godot_js_display_window_title_set(p_data) {
  document.title = GodotRuntime.parseString(p_data);
 }
 
+function _godot_js_eval(p_js, p_use_global_ctx, p_union_ptr, p_byte_arr, p_byte_arr_write, p_callback) {
+ const js_code = GodotRuntime.parseString(p_js);
+ let eval_ret = null;
+ try {
+  if (p_use_global_ctx) {
+   const global_eval = eval;
+   eval_ret = global_eval(js_code);
+  } else {
+   eval_ret = eval(js_code);
+  }
+ } catch (e) {
+  GodotRuntime.error(e);
+ }
+ switch (typeof eval_ret) {
+ case "boolean":
+  GodotRuntime.setHeapValue(p_union_ptr, eval_ret, "i32");
+  return 1;
+
+ case "number":
+  GodotRuntime.setHeapValue(p_union_ptr, eval_ret, "double");
+  return 3;
+
+ case "string":
+  GodotRuntime.setHeapValue(p_union_ptr, GodotRuntime.allocString(eval_ret), "*");
+  return 4;
+
+ case "object":
+  if (eval_ret === null) {
+   break;
+  }
+  if (ArrayBuffer.isView(eval_ret) && !(eval_ret instanceof Uint8Array)) {
+   eval_ret = new Uint8Array(eval_ret.buffer);
+  } else if (eval_ret instanceof ArrayBuffer) {
+   eval_ret = new Uint8Array(eval_ret);
+  }
+  if (eval_ret instanceof Uint8Array) {
+   const func = GodotRuntime.get_func(p_callback);
+   const bytes_ptr = func(p_byte_arr, p_byte_arr_write, eval_ret.length);
+   GROWABLE_HEAP_U8().set(eval_ret, bytes_ptr);
+   return 29;
+  }
+  break;
+ }
+ return 0;
+}
+
 var IDHandler = {
  _last_id: 0,
  _references: {},
@@ -10936,10 +10982,262 @@ function _godot_js_tts_stop() {
  window.speechSynthesis.resume();
 }
 
+var GodotJSWrapper = {
+ proxies: null,
+ cb_ret: null,
+ MyProxy: function(val) {
+  const id = IDHandler.add(this);
+  GodotJSWrapper.proxies.set(val, id);
+  let refs = 1;
+  this.ref = function() {
+   refs++;
+  };
+  this.unref = function() {
+   refs--;
+   if (refs === 0) {
+    IDHandler.remove(id);
+    GodotJSWrapper.proxies.delete(val);
+   }
+  };
+  this.get_val = function() {
+   return val;
+  };
+  this.get_id = function() {
+   return id;
+  };
+ },
+ get_proxied: function(val) {
+  const id = GodotJSWrapper.proxies.get(val);
+  if (id === undefined) {
+   const proxy = new GodotJSWrapper.MyProxy(val);
+   return proxy.get_id();
+  }
+  IDHandler.get(id).ref();
+  return id;
+ },
+ get_proxied_value: function(id) {
+  const proxy = IDHandler.get(id);
+  if (proxy === undefined) {
+   return undefined;
+  }
+  return proxy.get_val();
+ },
+ variant2js: function(type, val) {
+  switch (type) {
+  case 0:
+   return null;
+
+  case 1:
+   return !!GodotRuntime.getHeapValue(val, "i64");
+
+  case 2:
+   return GodotRuntime.getHeapValue(val, "i64");
+
+  case 3:
+   return GodotRuntime.getHeapValue(val, "double");
+
+  case 4:
+   return GodotRuntime.parseString(GodotRuntime.getHeapValue(val, "*"));
+
+  case 24:
+   return GodotJSWrapper.get_proxied_value(GodotRuntime.getHeapValue(val, "i64"));
+
+  default:
+   return undefined;
+  }
+ },
+ js2variant: function(p_val, p_exchange) {
+  if (p_val === undefined || p_val === null) {
+   return 0;
+  }
+  const type = typeof p_val;
+  if (type === "boolean") {
+   GodotRuntime.setHeapValue(p_exchange, p_val, "i64");
+   return 1;
+  } else if (type === "number") {
+   if (Number.isInteger(p_val)) {
+    GodotRuntime.setHeapValue(p_exchange, p_val, "i64");
+    return 2;
+   }
+   GodotRuntime.setHeapValue(p_exchange, p_val, "double");
+   return 3;
+  } else if (type === "string") {
+   const c_str = GodotRuntime.allocString(p_val);
+   GodotRuntime.setHeapValue(p_exchange, c_str, "*");
+   return 4;
+  }
+  const id = GodotJSWrapper.get_proxied(p_val);
+  GodotRuntime.setHeapValue(p_exchange, id, "i64");
+  return 24;
+ }
+};
+
+function _godot_js_wrapper_create_cb(p_ref, p_func) {
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(123, 1, p_ref, p_func);
+ const func = GodotRuntime.get_func(p_func);
+ let id = 0;
+ const cb = function() {
+  if (!GodotJSWrapper.get_proxied_value(id)) {
+   return undefined;
+  }
+  GodotJSWrapper.cb_ret = null;
+  const args = Array.from(arguments);
+  const argsProxy = new GodotJSWrapper.MyProxy(args);
+  func(p_ref, argsProxy.get_id(), args.length);
+  argsProxy.unref();
+  const ret = GodotJSWrapper.cb_ret;
+  GodotJSWrapper.cb_ret = null;
+  return ret;
+ };
+ id = GodotJSWrapper.get_proxied(cb);
+ return id;
+}
+
+function _godot_js_wrapper_create_object(p_object, p_args, p_argc, p_convert_callback, p_exchange, p_lock, p_free_lock_callback) {
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(124, 1, p_object, p_args, p_argc, p_convert_callback, p_exchange, p_lock, p_free_lock_callback);
+ const name = GodotRuntime.parseString(p_object);
+ if (typeof window[name] === "undefined") {
+  return -1;
+ }
+ const convert = GodotRuntime.get_func(p_convert_callback);
+ const freeLock = GodotRuntime.get_func(p_free_lock_callback);
+ const args = new Array(p_argc);
+ for (let i = 0; i < p_argc; i++) {
+  const type = convert(p_args, i, p_exchange, p_lock);
+  const lock = GodotRuntime.getHeapValue(p_lock, "*");
+  args[i] = GodotJSWrapper.variant2js(type, p_exchange);
+  if (lock) {
+   freeLock(p_lock, type);
+  }
+ }
+ try {
+  const res = new window[name](...args);
+  return GodotJSWrapper.js2variant(res, p_exchange);
+ } catch (e) {
+  GodotRuntime.error(`Error calling constructor ${name} with args:`, args, "error:", e);
+  return -1;
+ }
+}
+
+function _godot_js_wrapper_interface_get(p_name) {
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(125, 1, p_name);
+ const name = GodotRuntime.parseString(p_name);
+ if (typeof window[name] !== "undefined") {
+  return GodotJSWrapper.get_proxied(window[name]);
+ }
+ return 0;
+}
+
+function _godot_js_wrapper_object_call(p_id, p_method, p_args, p_argc, p_convert_callback, p_exchange, p_lock, p_free_lock_callback) {
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(126, 1, p_id, p_method, p_args, p_argc, p_convert_callback, p_exchange, p_lock, p_free_lock_callback);
+ const obj = GodotJSWrapper.get_proxied_value(p_id);
+ if (obj === undefined) {
+  return -1;
+ }
+ const method = GodotRuntime.parseString(p_method);
+ const convert = GodotRuntime.get_func(p_convert_callback);
+ const freeLock = GodotRuntime.get_func(p_free_lock_callback);
+ const args = new Array(p_argc);
+ for (let i = 0; i < p_argc; i++) {
+  const type = convert(p_args, i, p_exchange, p_lock);
+  const lock = GodotRuntime.getHeapValue(p_lock, "*");
+  args[i] = GodotJSWrapper.variant2js(type, p_exchange);
+  if (lock) {
+   freeLock(p_lock, type);
+  }
+ }
+ try {
+  const res = obj[method](...args);
+  return GodotJSWrapper.js2variant(res, p_exchange);
+ } catch (e) {
+  GodotRuntime.error(`Error calling method ${method} on:`, obj, "error:", e);
+  return -1;
+ }
+}
+
+function _godot_js_wrapper_object_get(p_id, p_exchange, p_prop) {
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(127, 1, p_id, p_exchange, p_prop);
+ const obj = GodotJSWrapper.get_proxied_value(p_id);
+ if (obj === undefined) {
+  return 0;
+ }
+ if (p_prop) {
+  const prop = GodotRuntime.parseString(p_prop);
+  try {
+   return GodotJSWrapper.js2variant(obj[prop], p_exchange);
+  } catch (e) {
+   GodotRuntime.error(`Error getting variable ${prop} on object`, obj);
+   return 0;
+  }
+ }
+ return GodotJSWrapper.js2variant(obj, p_exchange);
+}
+
+function _godot_js_wrapper_object_getvar(p_id, p_type, p_exchange) {
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(128, 1, p_id, p_type, p_exchange);
+ const obj = GodotJSWrapper.get_proxied_value(p_id);
+ if (obj === undefined) {
+  return -1;
+ }
+ const prop = GodotJSWrapper.variant2js(p_type, p_exchange);
+ if (prop === undefined || prop === null) {
+  return -1;
+ }
+ try {
+  return GodotJSWrapper.js2variant(obj[prop], p_exchange);
+ } catch (e) {
+  GodotRuntime.error(`Error getting variable ${prop} on object`, obj, e);
+  return -1;
+ }
+}
+
+function _godot_js_wrapper_object_set(p_id, p_name, p_type, p_exchange) {
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(129, 1, p_id, p_name, p_type, p_exchange);
+ const obj = GodotJSWrapper.get_proxied_value(p_id);
+ if (obj === undefined) {
+  return;
+ }
+ const name = GodotRuntime.parseString(p_name);
+ try {
+  obj[name] = GodotJSWrapper.variant2js(p_type, p_exchange);
+ } catch (e) {
+  GodotRuntime.error(`Error setting variable ${name} on object`, obj);
+ }
+}
+
+function _godot_js_wrapper_object_set_cb_ret(p_val_type, p_val_ex) {
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(130, 1, p_val_type, p_val_ex);
+ GodotJSWrapper.cb_ret = GodotJSWrapper.variant2js(p_val_type, p_val_ex);
+}
+
+function _godot_js_wrapper_object_setvar(p_id, p_key_type, p_key_ex, p_val_type, p_val_ex) {
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(131, 1, p_id, p_key_type, p_key_ex, p_val_type, p_val_ex);
+ const obj = GodotJSWrapper.get_proxied_value(p_id);
+ if (obj === undefined) {
+  return -1;
+ }
+ const key = GodotJSWrapper.variant2js(p_key_type, p_key_ex);
+ try {
+  obj[key] = GodotJSWrapper.variant2js(p_val_type, p_val_ex);
+  return 0;
+ } catch (e) {
+  GodotRuntime.error(`Error setting variable ${key} on object`, obj);
+  return -1;
+ }
+}
+
+function _godot_js_wrapper_object_unref(p_id) {
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(132, 1, p_id);
+ const proxy = IDHandler.get(p_id);
+ if (proxy !== undefined) {
+  proxy.unref();
+ }
+}
+
 var GodotWebGL2 = {};
 
 function _godot_webgl2_glFramebufferTextureMultiviewOVR(target, attachment, texture, level, base_view_index, num_views) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(123, 1, target, attachment, texture, level, base_view_index, num_views);
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(133, 1, target, attachment, texture, level, base_view_index, num_views);
  const context = GL.currentContext;
  if (typeof context.multiviewExt === "undefined") {
   const ext = context.GLctx.getExtension("OVR_multiview2");
@@ -10954,7 +11252,7 @@ function _godot_webgl2_glFramebufferTextureMultiviewOVR(target, attachment, text
 }
 
 function _godot_webgl2_glGetBufferSubData(target, offset, size, data) {
- if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(124, 1, target, offset, size, data);
+ if (ENVIRONMENT_IS_PTHREAD) return _emscripten_proxy_to_main_thread_js(134, 1, target, offset, size, data);
  const gl_context_handle = _emscripten_webgl_get_current_context();
  const gl = GL.getContext(gl_context_handle);
  if (gl) {
@@ -11528,7 +11826,9 @@ GodotOS.atexit(function(resolve, reject) {
  resolve();
 });
 
-var proxiedFunctionTable = [ null, exitOnMainThread, ___syscall_accept4, ___syscall_bind, ___syscall_chdir, ___syscall_chmod, ___syscall_connect, ___syscall_faccessat, ___syscall_fchmod, ___syscall_fcntl64, ___syscall_fstatat64, ___syscall_getcwd, ___syscall_getdents64, ___syscall_getsockname, ___syscall_ioctl, ___syscall_listen, ___syscall_lstat64, ___syscall_mkdir, ___syscall_open, ___syscall_poll, ___syscall_readlink, ___syscall_recvfrom, ___syscall_rename, ___syscall_rmdir, ___syscall_sendto, ___syscall_socket, ___syscall_stat64, ___syscall_statfs64, ___syscall_symlink, ___syscall_unlink, _tzset_impl, _emscripten_force_exit, _emscripten_set_canvas_element_size_main_thread, _emscripten_webgl_destroy_context, _emscripten_webgl_enable_extension, _environ_get, _environ_sizes_get, _fd_close, _fd_fdstat_get, _fd_read, _fd_seek, _fd_write, _getaddrinfo, _godot_audio_has_worklet, _godot_audio_init, _godot_audio_input_start, _godot_audio_input_stop, _godot_audio_is_available, _godot_audio_resume, _godot_audio_worklet_create, _godot_audio_worklet_start, _godot_js_config_canvas_id_get, _godot_js_config_locale_get, _godot_js_display_alert, _godot_js_display_canvas_focus, _godot_js_display_canvas_is_focused, _godot_js_display_clipboard_get, _godot_js_display_clipboard_set, _godot_js_display_cursor_is_hidden, _godot_js_display_cursor_is_locked, _godot_js_display_cursor_lock_set, _godot_js_display_cursor_set_custom_shape, _godot_js_display_cursor_set_shape, _godot_js_display_cursor_set_visible, _godot_js_display_desired_size_set, _godot_js_display_fullscreen_cb, _godot_js_display_fullscreen_exit, _godot_js_display_fullscreen_request, _godot_js_display_has_webgl, _godot_js_display_is_swap_ok_cancel, _godot_js_display_notification_cb, _godot_js_display_pixel_ratio_get, _godot_js_display_screen_dpi_get, _godot_js_display_screen_size_get, _godot_js_display_setup_canvas, _godot_js_display_size_update, _godot_js_display_touchscreen_is_available, _godot_js_display_tts_available, _godot_js_display_vk_available, _godot_js_display_vk_cb, _godot_js_display_vk_hide, _godot_js_display_vk_show, _godot_js_display_window_blur_cb, _godot_js_display_window_icon_set, _godot_js_display_window_size_get, _godot_js_display_window_title_set, _godot_js_fetch_create, _godot_js_fetch_free, _godot_js_fetch_http_status_get, _godot_js_fetch_is_chunked, _godot_js_fetch_read_chunk, _godot_js_fetch_read_headers, _godot_js_fetch_state_get, _godot_js_input_drop_files_cb, _godot_js_input_gamepad_cb, _godot_js_input_gamepad_sample, _godot_js_input_gamepad_sample_count, _godot_js_input_gamepad_sample_get, _godot_js_input_key_cb, _godot_js_input_mouse_button_cb, _godot_js_input_mouse_move_cb, _godot_js_input_mouse_wheel_cb, _godot_js_input_paste_cb, _godot_js_input_touch_cb, _godot_js_input_vibrate_handheld, _godot_js_os_download_buffer, _godot_js_os_execute, _godot_js_os_finish_async, _godot_js_os_fs_is_persistent, _godot_js_os_fs_sync, _godot_js_os_has_feature, _godot_js_os_hw_concurrency_get, _godot_js_os_request_quit_cb, _godot_js_os_shell_open, _godot_js_pwa_cb, _godot_js_pwa_update, _godot_js_tts_get_voices, _godot_js_tts_is_paused, _godot_js_tts_is_speaking, _godot_js_tts_pause, _godot_js_tts_resume, _godot_js_tts_speak, _godot_js_tts_stop, _godot_webgl2_glFramebufferTextureMultiviewOVR, _godot_webgl2_glGetBufferSubData ];
+GodotJSWrapper.proxies = new Map();
+
+var proxiedFunctionTable = [ null, exitOnMainThread, ___syscall_accept4, ___syscall_bind, ___syscall_chdir, ___syscall_chmod, ___syscall_connect, ___syscall_faccessat, ___syscall_fchmod, ___syscall_fcntl64, ___syscall_fstatat64, ___syscall_getcwd, ___syscall_getdents64, ___syscall_getsockname, ___syscall_ioctl, ___syscall_listen, ___syscall_lstat64, ___syscall_mkdir, ___syscall_open, ___syscall_poll, ___syscall_readlink, ___syscall_recvfrom, ___syscall_rename, ___syscall_rmdir, ___syscall_sendto, ___syscall_socket, ___syscall_stat64, ___syscall_statfs64, ___syscall_symlink, ___syscall_unlink, _tzset_impl, _emscripten_force_exit, _emscripten_set_canvas_element_size_main_thread, _emscripten_webgl_destroy_context, _emscripten_webgl_enable_extension, _environ_get, _environ_sizes_get, _fd_close, _fd_fdstat_get, _fd_read, _fd_seek, _fd_write, _getaddrinfo, _godot_audio_has_worklet, _godot_audio_init, _godot_audio_input_start, _godot_audio_input_stop, _godot_audio_is_available, _godot_audio_resume, _godot_audio_worklet_create, _godot_audio_worklet_start, _godot_js_config_canvas_id_get, _godot_js_config_locale_get, _godot_js_display_alert, _godot_js_display_canvas_focus, _godot_js_display_canvas_is_focused, _godot_js_display_clipboard_get, _godot_js_display_clipboard_set, _godot_js_display_cursor_is_hidden, _godot_js_display_cursor_is_locked, _godot_js_display_cursor_lock_set, _godot_js_display_cursor_set_custom_shape, _godot_js_display_cursor_set_shape, _godot_js_display_cursor_set_visible, _godot_js_display_desired_size_set, _godot_js_display_fullscreen_cb, _godot_js_display_fullscreen_exit, _godot_js_display_fullscreen_request, _godot_js_display_has_webgl, _godot_js_display_is_swap_ok_cancel, _godot_js_display_notification_cb, _godot_js_display_pixel_ratio_get, _godot_js_display_screen_dpi_get, _godot_js_display_screen_size_get, _godot_js_display_setup_canvas, _godot_js_display_size_update, _godot_js_display_touchscreen_is_available, _godot_js_display_tts_available, _godot_js_display_vk_available, _godot_js_display_vk_cb, _godot_js_display_vk_hide, _godot_js_display_vk_show, _godot_js_display_window_blur_cb, _godot_js_display_window_icon_set, _godot_js_display_window_size_get, _godot_js_display_window_title_set, _godot_js_fetch_create, _godot_js_fetch_free, _godot_js_fetch_http_status_get, _godot_js_fetch_is_chunked, _godot_js_fetch_read_chunk, _godot_js_fetch_read_headers, _godot_js_fetch_state_get, _godot_js_input_drop_files_cb, _godot_js_input_gamepad_cb, _godot_js_input_gamepad_sample, _godot_js_input_gamepad_sample_count, _godot_js_input_gamepad_sample_get, _godot_js_input_key_cb, _godot_js_input_mouse_button_cb, _godot_js_input_mouse_move_cb, _godot_js_input_mouse_wheel_cb, _godot_js_input_paste_cb, _godot_js_input_touch_cb, _godot_js_input_vibrate_handheld, _godot_js_os_download_buffer, _godot_js_os_execute, _godot_js_os_finish_async, _godot_js_os_fs_is_persistent, _godot_js_os_fs_sync, _godot_js_os_has_feature, _godot_js_os_hw_concurrency_get, _godot_js_os_request_quit_cb, _godot_js_os_shell_open, _godot_js_pwa_cb, _godot_js_pwa_update, _godot_js_tts_get_voices, _godot_js_tts_is_paused, _godot_js_tts_is_speaking, _godot_js_tts_pause, _godot_js_tts_resume, _godot_js_tts_speak, _godot_js_tts_stop, _godot_js_wrapper_create_cb, _godot_js_wrapper_create_object, _godot_js_wrapper_interface_get, _godot_js_wrapper_object_call, _godot_js_wrapper_object_get, _godot_js_wrapper_object_getvar, _godot_js_wrapper_object_set, _godot_js_wrapper_object_set_cb_ret, _godot_js_wrapper_object_setvar, _godot_js_wrapper_object_unref, _godot_webgl2_glFramebufferTextureMultiviewOVR, _godot_webgl2_glGetBufferSubData ];
 
 var ASSERTIONS = true;
 
@@ -11784,6 +12084,7 @@ var asmLibraryArg = {
  "godot_js_display_window_icon_set": _godot_js_display_window_icon_set,
  "godot_js_display_window_size_get": _godot_js_display_window_size_get,
  "godot_js_display_window_title_set": _godot_js_display_window_title_set,
+ "godot_js_eval": _godot_js_eval,
  "godot_js_fetch_create": _godot_js_fetch_create,
  "godot_js_fetch_free": _godot_js_fetch_free,
  "godot_js_fetch_http_status_get": _godot_js_fetch_http_status_get,
@@ -11821,6 +12122,16 @@ var asmLibraryArg = {
  "godot_js_tts_resume": _godot_js_tts_resume,
  "godot_js_tts_speak": _godot_js_tts_speak,
  "godot_js_tts_stop": _godot_js_tts_stop,
+ "godot_js_wrapper_create_cb": _godot_js_wrapper_create_cb,
+ "godot_js_wrapper_create_object": _godot_js_wrapper_create_object,
+ "godot_js_wrapper_interface_get": _godot_js_wrapper_interface_get,
+ "godot_js_wrapper_object_call": _godot_js_wrapper_object_call,
+ "godot_js_wrapper_object_get": _godot_js_wrapper_object_get,
+ "godot_js_wrapper_object_getvar": _godot_js_wrapper_object_getvar,
+ "godot_js_wrapper_object_set": _godot_js_wrapper_object_set,
+ "godot_js_wrapper_object_set_cb_ret": _godot_js_wrapper_object_set_cb_ret,
+ "godot_js_wrapper_object_setvar": _godot_js_wrapper_object_setvar,
+ "godot_js_wrapper_object_unref": _godot_js_wrapper_object_unref,
  "godot_webgl2_glFramebufferTextureMultiviewOVR": _godot_webgl2_glFramebufferTextureMultiviewOVR,
  "godot_webgl2_glGetBufferSubData": _godot_webgl2_glGetBufferSubData,
  "invoke_ii": invoke_ii,
@@ -11848,11 +12159,11 @@ var _emscripten_webgl_make_context_current = Module["_emscripten_webgl_make_cont
 
 var _emscripten_webgl_commit_frame = Module["_emscripten_webgl_commit_frame"] = createExportWrapper("emscripten_webgl_commit_frame");
 
+var _free = Module["_free"] = createExportWrapper("free");
+
 var __Z14godot_web_mainiPPc = Module["__Z14godot_web_mainiPPc"] = createExportWrapper("_Z14godot_web_mainiPPc");
 
 var _main = Module["_main"] = createExportWrapper("main");
-
-var _free = Module["_free"] = createExportWrapper("free");
 
 var _malloc = Module["_malloc"] = createExportWrapper("malloc");
 
@@ -12246,7 +12557,7 @@ var dynCall_iiiiijj = Module["dynCall_iiiiijj"] = createExportWrapper("dynCall_i
 
 var dynCall_iiiiiijj = Module["dynCall_iiiiiijj"] = createExportWrapper("dynCall_iiiiiijj");
 
-var __emscripten_allow_main_runtime_queued_calls = Module["__emscripten_allow_main_runtime_queued_calls"] = 2437492;
+var __emscripten_allow_main_runtime_queued_calls = Module["__emscripten_allow_main_runtime_queued_calls"] = 2438132;
 
 function invoke_vii(index, a1, a2) {
  var sp = stackSave();
@@ -12883,6 +13194,10 @@ if (!Object.getOwnPropertyDescriptor(Module, "GodotInput__user")) Module["GodotI
 if (!Object.getOwnPropertyDescriptor(Module, "GodotWebGL2")) Module["GodotWebGL2"] = (() => abort("'GodotWebGL2' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)"));
 
 if (!Object.getOwnPropertyDescriptor(Module, "GodotWebGL2__user")) Module["GodotWebGL2__user"] = (() => abort("'GodotWebGL2__user' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)"));
+
+if (!Object.getOwnPropertyDescriptor(Module, "GodotJSWrapper")) Module["GodotJSWrapper"] = (() => abort("'GodotJSWrapper' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)"));
+
+if (!Object.getOwnPropertyDescriptor(Module, "GodotJSWrapper__user")) Module["GodotJSWrapper__user"] = (() => abort("'GodotJSWrapper__user' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)"));
 
 if (!Object.getOwnPropertyDescriptor(Module, "warnOnce")) Module["warnOnce"] = (() => abort("'warnOnce' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)"));
 
