@@ -111,7 +111,92 @@
 		#download-section {
 			display: flex;
 			justify-content: center;
+			align-items: stretch;
 			margin-top: 20px;
+		}
+
+		#main-download {
+			margin-right: 10px;
+		}
+
+		.dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		.dropbtn {
+			background-color: #333;
+			color: #e0e0e0;
+			padding: 10px;
+			font-size: 0.65rem;
+			border: none;
+			cursor: pointer;
+			border-radius: 5px;
+			height: 100%;
+			display: flex;
+			align-items: center;
+		}
+
+		.dropdown-content {
+			display: none;
+			position: absolute;
+			background-color: #333;
+			width: 100%;
+			box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+			z-index: 1;
+			right: 0;
+			overflow: hidden;
+			border-radius: 5px;
+		}
+
+		.dropdown-content a {
+			color: white;
+			padding: 10px 16px;
+			text-decoration: none;
+			display: flex;
+			align-items: center;
+		}
+
+		.dropdown-content a:hover {
+			background-color: #ffffff1a;
+		}
+		
+		.dropdown-content a:active {
+			background-color: #ffffff40;
+		}
+
+		.dropdown-content a .platform-icon {
+			margin-right: 10px;
+			height: 1.5rem;
+			width: 1.5rem;
+		}
+
+		.dropdown-content a .text-container {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.dropdown-content a .small-text {
+			font-size: 0.45rem;
+		}
+
+		.dropdown-content a .big-text {
+			font-size: 0.75rem;
+			font-weight: 600;
+		}
+
+		.dropdown.active .dropdown-content {
+			display: block;
+		}
+
+		.dropdown:hover .dropbtn {
+			background-color: #444;
+		}
+
+		.download-option .platform-icon {
+			margin-right: 10px;
+			height: 1.5rem;
+			width: 1.5rem;
 		}
 
 		.download-button {
@@ -121,7 +206,6 @@
 			background-color: #2e6cb8;
 			color: white;
 			border-radius: 5px;
-			margin: 10px 8px;
 			padding: 10px;
 			text-decoration: none;
 		}
@@ -167,6 +251,19 @@
 		.download-button .big-text {
 			font-size: 0.75rem;
 			font-weight: 600;
+		}
+
+		.download-buttons-container {
+			display: flex;
+			align-items: stretch;
+			gap: 20px;
+			margin: 4px;
+		}
+
+		.dropdown .dropbtn {
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
 
 		#footer {
@@ -240,26 +337,6 @@
 			display: inline-block;
 			width: 0.85em;
 		}
-		
-		@media (max-width: 600px) {
-			html {
-				font-size: min(12vw, 24px);
-			}
-
-			.download-button {
-				padding: 5px;
-				margin: 5px 4px;
-			}
-
-			.download-button .platform-icon {
-				margin-right: 5px;
-			}
-
-			.tab {
-				padding: 5px;
-				margin: 5px;
-				font-size: 75%;
-			}
 	</style>
 </head>
 
@@ -277,27 +354,17 @@
 	<div style="height:0.5rem;"></div>
 	
 	<div class="content" id="download-section">
-		<a href="downloads/GodSVG.Windows.zip" class="download-button">
-			<img src="assets/platforms_windows.svg" class="platform-icon" alt="Windows logo">
-			<div align-items="vertical">
-				<div class="small-text">Download for</div>
-				<div class="big-text">Windows</div>
+		<div class="download-buttons-container">
+			<div id="main-download">
+				<!-- Main download button will be populated dynamically -->
 			</div>
-		</a>
-		<a href="downloads/GodSVG.Linux.zip" class="download-button">
-			<img src="assets/platforms_linux.svg" class="platform-icon" alt="Linux logo">
-			<div align-items="vertical">
-				<div class="small-text">Download for</div>
-				<div class="big-text">Linux</div>
+			<div class="dropdown">
+				<button class="dropbtn"></button>
+				<div class="dropdown-content">
+					<!-- Dropdown content will be populated dynamically -->
+				</div>
 			</div>
-		</a>
-		<a href="downloads/GodSVG.MacOS.zip" class="download-button">
-			<img src="assets/platforms_macos.svg" class="platform-icon" alt="MacOS logo">
-			<div align-items="vertical">
-				<div class="small-text">Download for</div>
-				<div class="big-text">MacOS</div>
-			</div>
-		</a>
+		</div>
 	</div>
 	<div class="dim-text" style="text-align: center;">Current version: <b>1.0-alpha4</b>. See all GodSVG releases <a href="https://github.com/MewPurPur/GodSVG/releases/">here</a>.</div>
 	
@@ -494,26 +561,73 @@
 				os = 'Windows';
 			} else if (/Android/.test(userAgent)) {
 				os = 'Android';
-			} else if (!os && /Linux/.test(platform)) {
+			} else if (/Linux/.test(platform)) {
 				os = 'Linux';
 			}
 
 			return os;
 		}
 
-		function applyInactiveStyles() {
+		function setDownloadButtons() {
 			var os = getOS();
-			var buttons = document.querySelectorAll('.download-button');
+			var mainDownloadDiv = document.getElementById('main-download');
+			var dropdownContent = document.querySelector('.dropdown-content');
+			var buttonContent = '';
+			var dropdownOptions = '';
 
-			buttons.forEach(function(button) {
-				var platform = button.getAttribute('href').split('.').slice(-2, -1)[0]; // Extract platform from href
-				if (!platform.includes(os)) {
-					button.classList.add('inactive');
+			var platforms = [
+				{name: 'Windows', icon: 'assets/platforms_windows.svg', link: 'downloads/GodSVG.Windows.zip'},
+				{name: 'Linux', icon: 'assets/platforms_linux.svg', link: 'downloads/GodSVG.Linux.zip'},
+				{name: 'MacOS', icon: 'assets/platforms_macos.svg', link: 'downloads/GodSVG.MacOS.zip'}
+			];
+
+			platforms.forEach(platform => {
+				if (platform.name === os) {
+					buttonContent = `
+						<a href="${platform.link}" class="download-button">
+							<img src="${platform.icon}" class="platform-icon" alt="${platform.name} logo">
+							<div>
+								<div class="small-text">Download for</div>
+								<div class="big-text">${platform.name}</div>
+							</div>
+						</a>`;
+				} else {
+					dropdownOptions += `
+						<a href="${platform.link}" class="download-option">
+							<img src="${platform.icon}" class="platform-icon" alt="${platform.name} logo">
+							<div class="text-container">
+								<span class="small-text">Download for</span>
+								<span class="big-text">${platform.name}</span>
+							</div>
+						</a>`;
 				}
+			});
+
+			if (!buttonContent) {
+				buttonContent = `<a href="#" class="download-button inactive"></a>`;
+				document.querySelector('.dropbtn').innerHTML = `View downloads<img style="margin-left: 8px" src="assets/chevron.svg"/>`;
+			} else {
+				document.querySelector('.dropbtn').innerHTML = `Other platforms<img style="margin-left: 8px" src="assets/chevron.svg"/>`;
+			}
+
+			mainDownloadDiv.innerHTML = buttonContent;
+			dropdownContent.innerHTML = dropdownOptions;
+
+			// Add click event for dropdown.
+			var dropdownBtn = document.querySelector('.dropbtn');
+			var dropdown = document.querySelector('.dropdown');
+			dropdownBtn.addEventListener('click', function(event) {
+				event.stopPropagation();
+				dropdown.classList.toggle('active');
+			});
+
+			// Close dropdown when clicking outside.
+			document.addEventListener('click', function() {
+				dropdown.classList.remove('active');
 			});
 		}
 
-		document.addEventListener('DOMContentLoaded', applyInactiveStyles);
+		document.addEventListener('DOMContentLoaded', setDownloadButtons);
 	</script>
 </body>
 
