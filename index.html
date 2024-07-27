@@ -275,7 +275,8 @@
 		.tab-container {
 			display: flex;
 			justify-content: center;
-			margin: 10px 0;
+			margin: 20px 0;
+			gap: 20px;
 		}
 
 		.tab {
@@ -285,7 +286,6 @@
 			color: #e0e0e0;
 			padding: 10px 20px;
 			border-radius: 5px;
-			margin: 10px;
 			cursor: pointer;
 			text-align: center; /* Center the text inside the tabs */
 		}
@@ -337,6 +337,20 @@
 			display: inline-block;
 			width: 0.85em;
 		}
+		
+		@media (max-width: 600px) {
+			html {
+				font-size: min(12vw, 24px);
+			}
+
+			.tab {
+				padding: 5px;
+				font-size: 75%;
+			}
+			
+			.tab-container {
+				gap: 10px;
+			}
 	</style>
 </head>
 
