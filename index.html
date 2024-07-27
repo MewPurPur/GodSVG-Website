@@ -219,23 +219,6 @@
 		.download-button:active {
 			background-color: #1e4a7c;
 		}
-		
-		.download-button.inactive {
-			background-color: #666;
-			color: #ccc;
-			transform: scale(0.8);
-			margin: 10px 4px;
-		}
-
-		.download-button.inactive:hover {
-			background-color: #777;
-			color: #ddd;
-		}
-		
-		.download-button.inactive:active {
-			background-color: #999;
-			color: #fff;
-		}
 
 		.download-button .platform-icon {
 			margin-right: 10px;
@@ -618,13 +601,13 @@
 			});
 
 			if (!buttonContent) {
-				buttonContent = `<a href="#" class="download-button inactive"></a>`;
+				mainDownloadDiv.style.display = 'none';
 				document.querySelector('.dropbtn').innerHTML = `View downloads<img style="margin-left: 8px" src="assets/chevron.svg"/>`;
 			} else {
+				mainDownloadDiv.innerHTML = buttonContent;
 				document.querySelector('.dropbtn').innerHTML = `Other platforms<img style="margin-left: 8px" src="assets/chevron.svg"/>`;
 			}
 
-			mainDownloadDiv.innerHTML = buttonContent;
 			dropdownContent.innerHTML = dropdownOptions;
 
 			// Add click event for dropdown.
