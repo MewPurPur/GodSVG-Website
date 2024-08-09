@@ -53,17 +53,18 @@
 		}
 
 		a {
-			color: #4284e0;
+			color: #489ae0;
+			text-decoration: underline;
+			text-decoration-color: #489ae080;
+		}
+
+		a:hover {
+			color: #64b8f7;
 			text-decoration: underline;
 		}
 
 		br {
 			margin-bottom: 0.25rem;
-		}
-
-		a:hover {
-			color: #64a8f7;
-			text-decoration: underline;
 		}
 
 		.content {
@@ -91,7 +92,7 @@
 			font-size: 0.65rem;
 			line-height: 1rem;
 			font-family: "Noto Sans";
-			color: #aaa;
+			color: #acacac;
 			margin-top: 0rem;
 			margin-bottom: 0.25rem;
 		}
@@ -252,7 +253,7 @@
 		#footer {
 			font-size: 0.5rem;
 			text-align: center;
-			color: #606468;
+			color: #686b70;
 		}
 
 		.tab-container {
@@ -602,10 +603,10 @@
 
 			if (!buttonContent) {
 				mainDownloadDiv.style.display = 'none';
-				document.querySelector('.dropbtn').innerHTML = `View downloads<img style="margin-left: 8px" src="assets/chevron.svg"/>`;
+				document.querySelector('.dropbtn').innerHTML = `View downloads<img style="margin-left: 8px" alt="" src="assets/chevron.svg"/>`;
 			} else {
 				mainDownloadDiv.innerHTML = buttonContent;
-				document.querySelector('.dropbtn').innerHTML = `Other platforms<img style="margin-left: 8px" src="assets/chevron.svg"/>`;
+				document.querySelector('.dropbtn').innerHTML = `Other platforms<img style="margin-left: 8px" alt="" src="assets/chevron.svg"/>`;
 			}
 
 			dropdownContent.innerHTML = dropdownOptions;
