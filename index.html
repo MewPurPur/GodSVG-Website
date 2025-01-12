@@ -8,10 +8,10 @@
 		"@type": "SoftwareApplication",
 		"name": "GodSVG",
 		"description": "GodSVG is a free, open-source, low-level vector graphics editor available on all major desktop platforms.",
-		"operatingSystem": ["Windows", "Linux", "MacOS"],
+		"operatingSystem": ["Windows", "Linux", "MacOS", "Android"],
 		"applicationCategory": "GraphicsApplication",
 		"downloadUrl": "https://github.com/MewPurPur/GodSVG/releases/",
-		"softwareVersion": "1.0-alpha4",
+		"softwareVersion": "1.0-alpha7",
 		"author": {
 			"@type": "Person",
 			"name": "MewPurPur"
@@ -365,10 +365,11 @@
 		</div>
 	</div>
 	<div style="height:0.25rem;"></div>
-	<div class="dim-text" style="text-align: center;">Current version: <b>1.0-alpha6</b>. You can find older releases <a href="https://github.com/MewPurPur/GodSVG/releases/">on Github</a>.</div>
+	<div class="dim-text" style="text-align: center;">Current version: <b>1.0-alpha7</b>. You can find older releases <a href="https://github.com/MewPurPur/GodSVG/releases/">on Github</a>.</div>
 	
 	<div class="content">
 		<div style="height:0.5rem;"></div>
+		<div class="dim-text">Note that the Android build is experimental.</div>
 		<div class="dim-text">Don't want to download anything? You can <a href="https://godsvg.com/editor">run GodSVG directly in your web browser</a>.</div>
 	</div>
 
@@ -403,7 +404,7 @@
 
 			<h2 class="faq-question">GodSVG has been in alpha for so long... Will it ever release?</h2>
 			<p class="dim-text">
-				GodSVG <b>1.0-alpha1</b> released in December 2023. It needs a lot more work, so it won't release until at least 2025.<br />
+				GodSVG <b>1.0-alpha1</b> released in December 2023. But GodSVG needs a lot more work, so it won't release until at least late 2025.<br />
 				GodSVG is a hobby project that I dedicate a lot of effort and time to try and push to the finish line. But of course, I still need to work 8h a day and spend time on things like sleeping, chores, staying healthy. How long the release will take largely depends on how much support I get.<br />
 				 Donations are the best way to help, without them, GodSVG would be way behind where it is now. So if you're able to <a onclick="toggle_content(2)" style="cursor: pointer">donate</a>, I would be very grateful!<br />
 				 You can also help by spreading the word, and if you can, implementing features, enhancements, bugfixes, or discussing suggestions.</p>
@@ -577,7 +578,8 @@
 			var platforms = [
 				{name: 'Windows', icon: 'assets/platforms_windows.svg', link: 'downloads/GodSVG.Windows.zip'},
 				{name: 'Linux', icon: 'assets/platforms_linux.svg', link: 'downloads/GodSVG.Linux.zip'},
-				{name: 'MacOS', icon: 'assets/platforms_macos.svg', link: 'downloads/GodSVG.MacOS.zip'}
+				{name: 'MacOS', icon: 'assets/platforms_macos.svg', link: 'downloads/GodSVG.MacOS.zip'},
+				{name: 'Android', icon: 'assets/platforms_android.svg', link: 'downloads/GodSVG.Android.zip'}
 			];
 
 			platforms.forEach(platform => {
